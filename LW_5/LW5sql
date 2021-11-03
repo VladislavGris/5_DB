@@ -1,0 +1,96 @@
+-- 1
+select tablespace_name, status, contents, logging from sys.dba_tablespaces;
+
+--2
+create tablespace GVA_QDATA
+datafile 'C:\app\Tablespaces\GVA_QDATA'
+size 10M
+extent management local
+offline;
+
+alter tablespace GVA_QDATA online;
+alter user GVACORE quota 2M on GVA_QDATA;
+
+drop tablespace GVA_QDATA;
+
+create table Tab(a number(6) primary key, b number(6)) tablespace GVA_QDATA;
+insert into Tab(a,b) values (1,1);
+insert into Tab(a,b) values (2,2);
+insert into Tab(a,b) values (3,3);
+select * from Tab;
+
+-- 3
+select * from dba_segments where tablespace_name = 'GVA_QDATA';
+
+-- 4
+drop table Tab;
+select * from dba_segments where tablespace_name = 'GVA_QDATA';
+select * from user_recyclebin;
+
+-- 5
+flashback table Tab to before drop;
+select * from dba_segments where tablespace_name = 'GVA_QDATA';
+
+-- 6
+begin 
+  for x in 4..10000
+  loop
+    insert into Tab(a,b) values (x,x);
+  end loop;
+end;
+select count(*) from Tab;
+
+-- 7
+select owner, segment_name, segment_type, tablespace_name, blocks,bytes, extents  
+from dba_segments where tablespace_name = 'GVA_QDATA' and segment_name = 'TAB';
+select * from user_extents where tablespace_name = 'GVA_QDATA' and segment_name = 'TAB';
+
+-- 8
+drop tablespace GVA_QDATA including contents and datafiles;
+
+-- 9
+select group#, members, status, first_change# from V$LOG;
+select * from V$LOG;
+
+-- 10
+select * from V$LOGFILE;
+
+-- 11 
+alter system switch logfile;
+
+-- 12
+alter database add logfile group 4 'C:\APP\ORCLUSR\ORADATA\ORCL\REDO04.LOG' size 10m blocksize 512;
+alter database add logfile member 'C:\APP\ORCLUSR\ORADATA\ORCL\REDO041.LOG' to group 4;
+alter database add logfile member 'C:\APP\ORCLUSR\ORADATA\ORCL\REDO042.LOG' to group 4;
+
+-- 13
+alter database drop logfile group 4;
+commit;
+
+-- 14
+select name, log_mode from V$DATABASE;
+select instance_name, archiver, active_state from V$INSTANCE;
+
+-- 15
+select * from V$LOG;
+select * from V$DAtABASE;
+
+-- 17
+alter system switch logfile;
+select * from v$archived_log;
+
+-- 19
+show parameter control;
+select * from v$controlfile;
+
+-- 20
+select type, record_size, records_total from V$CONTROLFILE_RECORD_SECTION;
+
+-- 22
+create pfile = 'gva_pfile.ora' from spfile;
+
+-- 23
+select * from v$pwfile_users;
+
+-- 24
+select * from v$diag_info;
