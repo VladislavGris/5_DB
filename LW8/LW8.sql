@@ -10,6 +10,7 @@
 -- 6
 -- connect gvacore/12345@//localhost:1521/gvapdb;
 -- conn gvacore/12345@GVAPDB
+-- connect gvacore/12345@(DESCRIPTION =(ADDRESS_LIST =(ADDRESS = (PROTOCOL = TCP)(HOST = DESKTOP-0EUKUTV)(PORT = 1521)))(CONNECT_DATA =(SERVICE_NAME = gvapdb)));
 -- 7
 select count(*) from Tab;
 -- 10
